@@ -2,6 +2,7 @@ try:
     import urllib.request as urllib2
 except ImportError:
     import urllib2
+
 from ics import Calendar, Event
 from dateutil.parser import parse
 from dateutil.rrule import rrule, DAILY, MO, TU, WE, TH, FR, SA, SU
@@ -9,7 +10,14 @@ import datetime as dt
 from bs4 import BeautifulSoup
 from datetime import timedelta
 
-soup = BeautifulSoup(open("schedule_view_source.txt"), "html.parser")
+scheduleHTML = ""
+
+with open("schedule_view_source.txt", "rb") as scheduleFile:
+	for line in scheduleFile:
+		scheduleHTML = scheduleHTML + (line.decode(errors='ignore'))
+
+# scrape the schedule from the HTML page
+soup = BeautifulSoup(scheduleHTML, "html.parser")
 scheduleBlocks = soup.find_all('table', {'class' : 'datadisplaytable'})
 classBlocks = soup.find_all('table', {'class': 'datadisplaytable', 'SUMMARY': 'This table lists the scheduled meeting times and assigned instructors for this class..'})
 
@@ -18,6 +26,7 @@ prevInstructor = ""
 
 c = Calendar()
 
+# group together classes and instructors (adjacent blocks in schedule)
 for scheduleBlock in scheduleBlocks:
 	time = ""
 	days = ""
@@ -34,6 +43,9 @@ for scheduleBlock in scheduleBlocks:
 		assignedTimes = scheduleBlock.find_all("tr")
 		# remove header
 		assignedTimes.pop(0)
+		# parse the times that the class runs from and until
+		# this can be dates (e.g. Dec 2 to 10th) and days of the week
+		# (e.g. Tuesday and Thursday.)
 		for assignedTime in assignedTimes:
 			assignedSlot = assignedTime.find_all("td")
 			time = assignedSlot[1].get_text()
@@ -44,6 +56,8 @@ for scheduleBlock in scheduleBlocks:
 			location = assignedSlot[3].get_text()
 			dates = assignedSlot[4].get_text()
 			tupleDays = ()
+			# convert Dal's day representation to rrules
+			# there is no Sunday in Dal's calendar, so S is always Saturday
 			dayToTupleLookup = {"M":MO, "T":TU, "W":WE, "R": TH, "F":FR, "S":SA}
 			for day in list(days):
 				tupleDays = tupleDays + (dayToTupleLookup[day],)
