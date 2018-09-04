@@ -9,6 +9,9 @@ from dateutil.rrule import rrule, DAILY, MO, TU, WE, TH, FR, SA, SU
 import datetime as dt
 from bs4 import BeautifulSoup
 from datetime import timedelta
+import pytz
+
+timezone = pytz.timezone('America/Halifax')
 
 scheduleHTML = ""
 
@@ -91,8 +94,10 @@ for scheduleBlock in scheduleBlocks:
                     aResult.date(),
                     dt.datetime.strptime(str(endTime),
                                          "%I:%M %p").time())
-                e.begin = finalStartTime + timedelta(hours=3)
-                e.end = finalEndTime + timedelta(hours=3)  # timezone fix
+
+                e.begin = timezone.localize(finalStartTime)
+                e.end = timezone.localize(finalEndTime)
+
                 e.description = "Taught by " + prevInstructor
                 e.location = location
                 c.events.add(e)
@@ -102,8 +107,6 @@ for scheduleBlock in scheduleBlocks:
 
 with open("dal_schedule.ics", "w") as f:
     f.writelines(c)
-
-# terrible hack to fix timezone issues (off by three hours)
 
 timezoneFix = """VERSION:2.0
 X-WR-TIMEZONE:America/Halifax
