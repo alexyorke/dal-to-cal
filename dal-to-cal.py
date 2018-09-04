@@ -5,13 +5,10 @@ import string
 # log the user in and get the schedule page
 import requests
 import getpass
+from bs4 import BeautifulSoup
 
-print("=========================================================")
-print("Dal-to-cal will create a schedule for the Fall 2018 term.")
-print("=========================================================")
-
-username = input("Enter your Dal NetID (not your CSID!):")
-password = getpass.getpass("Enter your Dal NetID password (won't show up when you're typing):")
+username = input("Enter your Dal NetID (not your CSID!): ")
+password = getpass.getpass("Enter your Dal NetID password (won't show up when you're typing): ")
 
 # go to login page to get initial cookies (weird but ok)
 s = requests.Session()
@@ -25,8 +22,23 @@ response = s.post('https://dalonline.dal.ca/PROD/twbkwbis.P_ValLogin', cookies=c
 if "Incorrect NetID or password. Please try again." in response.text:
     print("Incorrect password or username! Try again.")
     exit()
-	
-schedule = s.post('https://dalonline.dal.ca/PROD/bwskfshd.P_CrseSchdDetl', cookies=cookies, data="term_in=201910").text
+
+# ask user to select term
+termHTML = s.post('https://dalonline.dal.ca/PROD/bwskflib.P_SelDefTerm', cookies=cookies, allow_redirects=True, headers=None)
+
+soup = BeautifulSoup(termHTML.text, 'html.parser')
+terms = {}
+for option in soup.find_all('option'):
+    terms[option.text] = option['value']
+
+from pick import pick
+title = 'Please choose your term that you would like a schedule for (use arrow keys to select): '
+options = list(terms.keys())
+option, index = pick(options, title)
+
+term_in_val = terms[option]
+
+schedule = s.post('https://dalonline.dal.ca/PROD/bwskfshd.P_CrseSchdDetl', cookies=cookies, data="term_in=" + term_in_val).text
 
 print("I'm working my magic. Please wait...")
 
@@ -39,7 +51,6 @@ from ics import Calendar, Event
 from dateutil.parser import parse
 from dateutil.rrule import rrule, DAILY, MO, TU, WE, TH, FR, SA, SU
 import datetime as dt
-from bs4 import BeautifulSoup
 from datetime import timedelta
 import pytz
 
@@ -180,6 +191,6 @@ if (response == "y"):
     shutil.move("dal_schedule.ics", calendar_path)
     print("Remember to delete the file from " + calendar_path + " when you are done!")
     print("")
-    print("Pssst! It's available at https://web.cs.dal.ca/~/" + getpass.getuser() + "/" + random_filename)
+    print("Pssst! It's available at https://web.cs.dal.ca/~ayorke/" + random_filename)
 else:
     print("No problem. I created the file called dal_schedule.ics which you can download later.")
