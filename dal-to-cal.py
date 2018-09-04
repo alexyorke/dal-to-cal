@@ -1,6 +1,8 @@
 import shutil, sys
 import random
 import string
+import re
+from slugify import slugify
 
 # log the user in and get the schedule page
 import requests
@@ -186,11 +188,12 @@ print("Finished creating your schedule! You must be excited.")
 response = input("Would you like to download your schedule using a web browser? (recommended): type y or n: ")
 
 if (response == "y"):
-    random_filename = "dal_schedule_" + ''.join(random.choices(string.ascii_uppercase + string.digits, k=14)) + ".ics"
+    chosenTerm = slugify(option)
+    random_filename = "dal_sched_" + chosenTerm + ''.join(random.choices(string.ascii_uppercase + string.digits, k=14)) + ".ics"
     calendar_path = "/users/webhome/" + getpass.getuser() + "/" + random_filename
     shutil.move("dal_schedule.ics", calendar_path)
     print("Remember to delete the file from " + calendar_path + " when you are done!")
     print("")
-    print("Pssst! It's available at https://web.cs.dal.ca/~/" + getpass.getuser() + "/" + random_filename)
+    print("Pssst! It's available at https://web.cs.dal.ca/~" + getpass.getuser() + "/" + random_filename)
 else:
     print("No problem. I created the file called dal_schedule.ics which you can download later.")
