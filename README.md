@@ -20,3 +20,7 @@ This script generates events for all courses (even conflicting ones.) However, w
 ### I don't have a clue what you're talking about but it looks cool. How do I make my own schedule?
 
 Snag a computer science student and get them to help you with it. Some might be hanging out in the Goldberg building, but they are afraid of loud noises, so don't scare them.
+
+### How do I import this file into Google Calendar?
+
+Go to https://calendar.google.com/calendar/r/settings/export then click on "Select a file from your computer." Select the `dal_schedule.ics` file that you downloaded, then import it. It's recommended that you create a new calendar to import the events into, in case you have to change your classes later (and don't want to manually delete all of the events.)
