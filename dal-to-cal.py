@@ -191,6 +191,6 @@ if (response == "y"):
     shutil.move("dal_schedule.ics", calendar_path)
     print("Remember to delete the file from " + calendar_path + " when you are done!")
     print("")
-    print("Pssst! It's available at https://web.cs.dal.ca/~ayorke/" + random_filename)
+    print("Pssst! It's available at https://web.cs.dal.ca/~/" + getpass.getuser() + "/" + random_filename)
 else:
     print("No problem. I created the file called dal_schedule.ics which you can download later.")
