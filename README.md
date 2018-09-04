@@ -3,11 +3,13 @@ Generate an iCal-compatible file (events with alarms) for your classes automatic
 
 ![image](https://i.imgur.com/nbg32Qg.jpg)
 
-This program converts your Dalhousie class schedule into a calendar format for your phone or computer. It's a bit hacky but it seems to work fine.
+This program converts your Dalhousie class schedule into a calendar format for your phone or computer.
 
-Currently, there are issues with daylight savings time after November 6th. This should be fixed in the next version.
+## How to use (quick start)
 
-## How to use
+Download the Google Chrome extension, and just click on the button (coming soon!)
+
+## How to use (for developers)
 
 1. clone this repo `git clone https://github.com/alhexyorke/dal-to-cal`
 
